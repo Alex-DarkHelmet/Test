@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Test</string>
+    <string name="sign_in">Sign In</string>
+    <string name="Email">Email</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="create">Create</string>
+    <string name="create_account">Create Account?</string>
+    <string name="location_title">Last known location:</string>
+    <string name="first_seen">First seen in:</string>
+    <string name="logout">Logout</string>
+</resources>

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "961372662727",
+    "project_id": "test-9a0c4",
+    "storage_bucket": "test-9a0c4.appspot.com",
+    "url": "https://test-9a0c4-default-rtdb.asia-southeast1.firebasedatabase.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:961372662727:android:435dc61fe8fe31e4aa47e2",
+        "android_client_info": {
+          "package_name": "com.alex_bystrov.test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJb5KXZEWcInJFcmcFcMEszh0RZ81t4so"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
