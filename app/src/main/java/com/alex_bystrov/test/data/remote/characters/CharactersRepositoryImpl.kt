@@ -1,51 +1,73 @@
 package com.alex_bystrov.test.data.remote.characters
 
 import android.util.Log
-import coil.request.ImageRequest
-import com.alex_bystrov.test.data.remote.RetrofitClient
-import com.alex_bystrov.test.model.Character
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import java.net.ServerSocket
-import java.util.logging.SocketHandler
+import com.alex_bystrov.test.data.model.CharacterMapper
+import com.alex_bystrov.test.domain.model.Character
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class CharactersRepositoryImpl{
-    private val api = RetrofitClient.characterResponse()
+class CharactersRepositoryImpl @Inject constructor(
+    private val api: CharactersApi
+) : CharactersRepository {
 
-    private val _characters: MutableStateFlow<List<Character>> = MutableStateFlow(
-        emptyList()
-    )
-    val characters: StateFlow<List<Character>> = _characters
+    private val mapper = CharacterMapper()
 
-    suspend fun fetchCertainCharacter() {
-        try {
-            val response = api.getCharacter(1)
-            _characters.emit(listOf(response))
-        } catch (e: Exception) {
-            Log.i("FailedLoadingData", "Exception - $e")
-        }
-    }
-
-    suspend fun fetchCharacters() {
-        try {
-            val response = api.getCharactersList()
-            _characters.emit(response.items)
-        } catch (e: Exception) {
-            Log.i("LoadingCharacters", "Exception - $e")
-        }
-    }
-
-    suspend fun fetchCharactersFromPage(page: Int) {
+    override suspend fun getCharactersByPage(page: Int): List<Character> {
         try {
             val response = api.getCharactersFromPage(page)
+            return mapper.mapListCharacterModelToDomain(response.items)
             Log.i("CharacterResponse", "$response")
-            _characters.emit(response.items)
         } catch (e: Exception) {
+            throw RuntimeException(e)
             Log.i("LoadingCharacters", "Failed fetching characters - $e")
         }
+    }
+
+    override suspend fun getCharacters(): Flow<List<Character>> {
+//        try {
+//            val response = api.getCharactersList().items
+//            return mapper.mapListCharacterModelToDomain(response)
+//        } catch (e: Exception) {
+//            throw RuntimeException(e)
+//        }
+
+        return fetchAllPages()
+    }
+
+    override suspend fun getCharacterById(id: Int): Character {
+        TODO("Not yet implemented")
+    }
+
+    private suspend fun testFetchAllPages(): List<Character> {
+        val characters = mutableListOf<Character>()
+        var counter = 1
+
+        while (counter != TOTAL_PAGES + 1) {
+            val response = api.getCharactersFromPage(counter).items
+            val mappedCharacters = mapper.mapListCharacterModelToDomain(response)
+            mappedCharacters.forEach { characters.add(it) }
+            counter++
+        }
+        return characters
+    }
+
+    // make hot flow for emit data to repository
+    private suspend fun initFetchingCharacters(): List<Character> {
+        val response = api.getCharactersList()
+        return mapper.mapListCharacterModelToDomain(response.items)
+    }
+
+    private suspend fun fetchAllPages(): Flow<List<Character>> {
+        return flow {
+            repeat(TOTAL_PAGES) {
+                val response = api.getCharactersFromPage(it)
+                emit(mapper.mapListCharacterModelToDomain(response.items))
+            }
+        }
+    }
+
+    companion object {
+        private const val TOTAL_PAGES = 42
     }
 }

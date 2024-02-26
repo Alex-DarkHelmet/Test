@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.alex_bystrov.test.R
 import com.alex_bystrov.test.data.remote.auth.AuthAnswer
@@ -20,7 +21,7 @@ class SignInFragment : Fragment() {
     private val binding: SingInFragmentBinding
         get() = _binding ?: throw RuntimeException("LoginFragmentBinding = null")
 
-    private val viewModel: AuthViewModel = AuthViewModel()
+    private val viewModel by viewModels<AuthViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,7 +34,7 @@ class SignInFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-//        launchCharactersFragment()
+        launchCharactersFragment("1")
 
         collectAuthState()
 
@@ -61,7 +62,8 @@ class SignInFragment : Fragment() {
                     }
 
                     is AuthAnswer.Succeed -> {
-                        launchCharactersFragment(viewModel.currentUserId)
+                        val succeedAnswer = viewModel.authState.value as AuthAnswer.Succeed
+                        launchCharactersFragment(succeedAnswer.userId)
                     }
 
                     AuthAnswer.Init -> {
